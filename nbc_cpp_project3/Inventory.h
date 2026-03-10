@@ -24,15 +24,27 @@ private:
 	T* pItems_;
 	int capacity_;
 	int size_;
-	void resize(const int newSize);
 public:
 	Inventory(int capacity = 10);
 	Inventory(const Inventory<T>& other);
 	~Inventory();
+	//오퍼레이터 = 를 이용한 대입?
+	Inventory& operator=(const Inventory& other) {
+		if (this != other) {//1. other가 자신이 아니라면
+			delete[] pItems_;//2. 자신이 가지고있던 메모리를 해제하고
+			this->capacity_ = other.capacity_;
+			this->size_ = other.size_;
+			this->pItems_ = new T[capacity_];
+			//3. 값 및 메모리 깊은복사
+			copy(other.pItems_, other.pItems_ + getSize(), this->pItems_);
+		}
+		//자기 자신 반환.
+		return *this;
+	}
 
 	void assign(const Inventory<T>& other);
 	void sortItems();
-	
+	void resize(const int newSize);
 	void addItem(const T& item);
 	void removeLastItem();
 	void printAllItems();
@@ -53,7 +65,6 @@ Inventory<T>::Inventory(const Inventory<T>& other) : size_(other.size_), capacit
 {
 	this->pItems_ = new T[capacity_];
 	copy(other.pItems_, other.pItems_ + getSize(), this->pItems_);
-
 }
 
 template<typename T>
@@ -72,7 +83,6 @@ void Inventory<T>::assign(const Inventory<T>& other)
 	this->size_ = other.size_;
 	this->pItems_ = new T[capacity_];
 	copy(other.pItems_, other.pItems_ + getSize(), this->pItems_);
-
 }
 
 template<typename T>
@@ -86,7 +96,6 @@ void Inventory<T>::resize(const int newCapacity)
 		}
 		delete[] this->pItems_;
 		this->pItems_ = newItems;
-
 		this->capacity_ = newCapacity;
 	}
 	//인벤토리가 줄어든다면 새 크기를 초과하는 부분은 버리고 진행하도록.
@@ -99,8 +108,6 @@ void Inventory<T>::resize(const int newCapacity)
 		this->pItems_ = newItems;
 		this->size_ = this->size_ > newCapacity ? newCapacity : this->size_;//작은쪽으로
 		this->capacity_ = newCapacity;
-
-
 	}
 }
 
@@ -125,10 +132,9 @@ template<typename T>
 void Inventory<T>::addItem(const T& item)
 {
 	if (getSize() == getCapasity()) {
-		cout << "인벤토리 자동확장" << endl;
+		cout << "인벤토리 자동확장됨" << endl;
 		resize(getCapasity() * 2);
 	}
-
 	this->pItems_[getSize()] = item;
 	size_ += 1;
 }
@@ -139,7 +145,6 @@ void Inventory<T>::removeLastItem()
 	if (size_ > 0) {
 		//this->pItems_[this->size_] = NULL;
 		size_ -= 1;
-
 	}
 }
 
